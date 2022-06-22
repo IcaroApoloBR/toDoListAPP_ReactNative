@@ -58,10 +58,10 @@ export default function App() {
 
   return (
     <SafeAreaView style={styles.container}>
-      <StatusBar backgroundColor="#171d31" barStyle="light" />
+      <StatusBar backgroundColor="#6a040f" barStyle="light" />
 
       <View style={styles.content}>
-        <Text style={styles.title}>To Do List!</Text>
+        <Text style={styles.title}>To-Do List</Text>
       </View>
 
       <FlatList
@@ -88,14 +88,14 @@ export default function App() {
               multiline={true}
               placeholderTextColor="#747474"
               autoCorrect={false}
-              placeholder="O que precisa fazer hoje?"
+              placeholder="What do you need to do today?"
               style={styles.input}
               value={input}
               onChangeText={(text) => setInput(text)}
             />
 
             <TouchableOpacity style={styles.handleAdd} onPress={handleAdd}>
-              <Text style={styles.handleAddText}>Cadastrar</Text>
+              <Text style={styles.handleAddText}>Add</Text>
             </TouchableOpacity>
           </Animatable.View>
 
@@ -118,7 +118,7 @@ export default function App() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#171d31',
+    backgroundColor: '#6a040f',
   },
   title: {
     marginTop: 10,
@@ -132,7 +132,7 @@ const styles = StyleSheet.create({
     width: 60,
     height: 60,
     borderRadius: 30,
-    backgroundColor: '#0094ff',
+    backgroundColor: '#d00000',
     justifyContent: 'center',
     alignItems: 'center',
     right: 25,
@@ -148,7 +148,7 @@ const styles = StyleSheet.create({
   },
   modal: {
     flex: 1,
-    backgroundColor: '#171d31',
+    backgroundColor: '#6a040f',
   },
   modalHeader: {
     marginLeft: 10,
