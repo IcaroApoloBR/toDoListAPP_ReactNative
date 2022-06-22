@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { StyleSheet, Text, SafeAreaView, StatusBar, View, TouchableOpacity, FlatList, Modal, TextInput } from 'react-native';
+import React, { useState, useCallback, useEffect } from 'react';
+import { AsyncStorage, StyleSheet, Text, SafeAreaView, StatusBar, View, TouchableOpacity, FlatList, Modal, TextInput } from 'react-native';
 
 import { Ionicons } from '@expo/vector-icons';
 import * as Animatable from 'react-native-animatable';
@@ -9,16 +9,56 @@ import TaskList from './src/components/TaskList';
 const AnimatedBtn = Animatable.createAnimatableComponent(TouchableOpacity);
 
 export default function App() {
-  const [task, setTask] = useState([
-    { key: 1, task: 'Comprar' },
-    { key: 2, task: 'Vender' },
-    { key: 3, task: 'Alugar' },
-  ]);
+  const [task, setTask] = useState([]);
   const [open, setOpen] = useState(false);
+  const [input, setInput] = useState('');
+
+  // GET ALL TASK WHEN APP INIT
+  useEffect(() => {
+    async function loadTasks() {
+      const taskStorage = await AsyncStorage.getItem('@task');
+
+      if (taskStorage) {
+        setTask(JSON.parse(taskStorage));
+      }
+    }
+
+    loadTasks();
+
+  }, []);
+
+  // SAVE TASK WHEN ALTERED
+  useEffect(() => {
+    async function saveTasks() {
+      await AsyncStorage.setItem('@task', JSON.stringify(task));
+
+    }
+
+    saveTasks();
+
+  }, [task]);
+
+  function handleAdd() {
+    if (input === '') return;
+
+    const data = {
+      key: input,
+      task: input,
+    };
+
+    setTask([...task, data]);
+    setOpen(false);
+    setInput('');
+  }
+
+  const handleDelete = useCallback((data) => {
+    const find = task.filter(r => r.key !== data.key);
+    setTask(find);
+  })
 
   return (
     <SafeAreaView style={styles.container}>
-      <StatusBar backgroundColor="#0000CD" barStyle="light" />
+      <StatusBar backgroundColor="#171d31" barStyle="light" />
 
       <View style={styles.content}>
         <Text style={styles.title}>To Do List!</Text>
@@ -30,7 +70,7 @@ export default function App() {
         // showsVerticalScrollIndicator={false}
         showsHorizontalScrollIndicator={false}
         keyExtractor={(item) => String(item.key)}
-        renderItem={({ item }) => <TaskList data={item} />}
+        renderItem={({ item }) => <TaskList data={item} handleDelete={handleDelete} />}
       />
 
       <Modal animationType="slide" transparent={false} visible={open}>
@@ -42,6 +82,22 @@ export default function App() {
             </TouchableOpacity>
             <Text style={styles.modalTitle}>New Task</Text>
           </View>
+
+          <Animatable.View style={styles.modalBody} animation="fadeInUp" useNativeDriver>
+            <TextInput
+              multiline={true}
+              placeholderTextColor="#747474"
+              autoCorrect={false}
+              placeholder="O que precisa fazer hoje?"
+              style={styles.input}
+              value={input}
+              onChangeText={(text) => setInput(text)}
+            />
+
+            <TouchableOpacity style={styles.handleAdd} onPress={handleAdd}>
+              <Text style={styles.handleAddText}>Cadastrar</Text>
+            </TouchableOpacity>
+          </Animatable.View>
 
         </SafeAreaView>
       </Modal>
@@ -104,5 +160,30 @@ const styles = StyleSheet.create({
     marginLeft: 15,
     fontSize: 23,
     color: '#fff'
+  },
+  input: {
+    fontSize: 15,
+    marginLeft: 10,
+    marginRight: 10,
+    marginTop: 30,
+    backgroundColor: '#fff',
+    padding: 9,
+    height: 85,
+    textAlignVertical: 'top',
+    color: '#000',
+    borderRadius: 5,
+  },
+  handleAdd: {
+    backgroundColor: '#fff',
+    marginTop: 10,
+    marginLeft: 10,
+    marginRight: 10,
+    height: 40,
+    borderRadius: 5,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  handleAddText: {
+    fontSize: 20,
   }
 });
